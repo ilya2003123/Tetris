@@ -38,9 +38,9 @@ int main()
 
 	Point a[4]; // массивчик для нахождения точек
 
-	bool s = true;
+	bool s = true, rotate = false;
 
-	int dx = 0;
+	int dx = 0, dy = 0;
 
 	while (window.isOpen())
 	{
@@ -54,7 +54,7 @@ int main()
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 		{
-			
+			rotate = true;
 		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
@@ -67,12 +67,35 @@ int main()
 			dx = 1;
 		}
 
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+		{
+			dy = 2;
+		}
+
 		for (int i = 0; i < 4; i++)
 		{
 			a[i].x += dx;
 		}
 
-		int n = 6;
+		for (int i = 0; i < 4; i++)
+		{
+			a[i].y += dy;
+		}
+
+		if (rotate == true)
+		{
+			Point t = a[1];
+			for (int i = 0; i < 4; i++)
+			{
+				int x, y;
+				x = a[i].y - t.y;
+				y = a[i].x - t.x;
+				a[i].x = t.x - x;
+				a[i].y = t.y + y;
+			}
+		}
+
+		int n = 2;
 
 		if (s == true)
 		{
@@ -85,6 +108,7 @@ int main()
 		}
 
 		dx = 0;
+		rotate = false;
 		
 	
 		window.clear();
