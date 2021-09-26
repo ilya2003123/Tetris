@@ -35,7 +35,7 @@ bool check()
 		{
 			return 0;
 		}
-		else if (pole[a[i].y][a[i].x])
+		else if (a[i].y >= 0 && pole[a[i].y][a[i].x])
 		{
 			if (a[i].y <= 0)
 			{
@@ -159,15 +159,39 @@ int main()
 	texture_fon.loadFromFile("image/fon1.png");
 	sf::Sprite sprite_fon(texture_fon);
 
-	sprite.setTextureRect(sf::IntRect(0, 0, 40, 40));
+	sf::Texture texture_score;
+	texture_score.loadFromFile("image/Score.png");
+	sf::Sprite sprite_score(texture_score);
+
+	sf::Texture texture_next;
+	texture_next.loadFromFile("image/Next.png");
+	sf::Sprite sprite_next(texture_next);
+
+	sf::Font font;
+	font.loadFromFile("rus.ttf");
+
+	font.loadFromFile("rus.ttf");
+
+	sf::Text txt;
+	txt.setFont(font);
+	txt.setCharacterSize(62);
+	txt.setFillColor(sf::Color::Red);
 
 	bool rotate = false, begin = true;
 
-	int dx = 0, colorNum = rand() % 6;
-
-	int n = rand() % 6;
+	int dx = 0, colorNum = rand() % 6, score = 0;
 
 	float timer = 0, delay = 0.3;
+
+	//nt n = rand() % 7;
+
+	//
+	//1 2
+	//-1 2
+	//int k = 0
+	//
+	int current = 0;
+	int rnd[2] = { rand() % 7 , rand() % 7  };
 
 	sf::Clock clock;
 
@@ -267,12 +291,19 @@ int main()
 					}
 				}
 				colorNum = rand() % 6;
-				n = rand() % 7;
 				for (int i = 0; i < 4; i++)
 				{
-					a[i].x = figures[n][i] % 2 + 6;
-					a[i].y = figures[n][i] / 2 - 5;
+					a[i].x = figures[rnd[current]][i] % 2 + 6;
+					a[i].y = figures[rnd[current]][i] / 2 - 5;
 				}
+				if (current == 0){
+						current = 1;
+						rnd[0] = rand() % 7;
+					}else if(current == 1){
+						current = 0;
+						rnd[1] = rand() % 7;
+					}
+						
 			}
 			timer = 0;
 		}
@@ -293,18 +324,37 @@ int main()
 			{
 				k--;
 			}
+			if (count == 15)
+			{
+				score += 50;
+			}
+			if (count == 30)
+			{
+				score += 150;
+			}
+			if (count == 45)
+			{
+				score += 250;
+			}
+			if (count == 60)
+			{
+				score += 400;
+			}
 		}
 
 		if (begin == true)
 		{
 			begin = false;
 
-			n = rand() % 7;
+			//n = rand() % 7;
 
 			for (int i = 0; i < 4; i++)
 			{
-				a[i].x = figures[n][i] % 2 + 6; // С помощью этого цикла переводим координаты в "видимые" нам
-				a[i].y = figures[n][i] / 2 - 5;
+				//a[i].x = figures[n][i] % 2 + 6; // С помощью этого цикла переводим координаты в "видимые" нам
+				//a[i].y = figures[n][i] / 2 - 5;
+				a[i].x = figures[rnd[current]][i] % 2 + 6;
+			    a[i].y = figures[rnd[current]][i] / 2 - 5;
+			    
 			}
 		}
 
@@ -312,7 +362,7 @@ int main()
 		rotate = false;
 		delay = 0.3;
 	
-		window.clear(sf::Color::White);
+		window.clear();
 
 		window.draw(sprite_fon);
 
@@ -355,9 +405,29 @@ int main()
 
 		if (endGame() == false || end == true)
 		{	
-		//	window.display();
-			
 			menu(window);
+
+			end = false;
+
+			rotate = false;
+
+			begin = true;
+
+			dx = 0;
+
+			colorNum = rand() % 6;
+
+			//n = rand() % 7;
+
+			score = 0;
+
+			timer = 0, delay = 0.3;
+
+			for (int i = 0; i < 4; i++)
+			{
+				a[i] = { 0,0 }; // x и y в нули
+				b[i] = { 0,0 };
+			}
 
 			for (int i = 0; i < H; i++)
 			{
@@ -367,6 +437,17 @@ int main()
 				}
 			}
 		}
+
+		sprite_score.setPosition(1230, 100);
+
+		window.draw(sprite_score);
+
+		txt.setString(std::to_string(score) + " NextFig = " + std::to_string(rnd[(current)?0:1]));
+		txt.setPosition(1480, 130);
+
+		sprite_next.setPosition(300, 100);
+		window.draw(sprite_next);
+		window.draw(txt);
 
 		window.display();
 	}
