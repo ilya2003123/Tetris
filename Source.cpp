@@ -1,5 +1,57 @@
 #include <SFML/Graphics.hpp>
 #include<ctime>
+#include<iostream>
+
+const int H = 20; // Высота нашего поля
+const int W = 15; // Ширина нашего поля
+
+int pole[H][W] = { 0 };
+
+int figures[7][4] =
+{
+	1,3,5,7, // I
+	2,4,5,7, // Z
+	3,5,4,6, // S
+	3,5,4,7, // T
+	2,3,5,7, // L
+	3,5,7,6, // J
+	2,3,4,5, // O
+};
+
+struct Points
+{
+	int x, y;
+};
+
+Points a[4], b[4]; // а[4] массивчик для нахождения точек, b[4] вспомогательный массивчик 
+
+bool check()
+{
+	for (int i = 0; i < 4; i++)
+	{
+		if (a[i].x < 0 || a[i].x >= W || a[i].y >= H)
+		{
+			return 0;
+		}
+		else if (pole[a[i].y][a[i].x])
+		{
+			return 0;
+		}
+	}
+		return 1;
+}
+
+bool EndGame()
+{
+	for (int i = 0; i < W; i++)
+	{
+		if (pole[1][i] == true)
+		{
+			return 0;
+		}
+		return 1;
+	}
+}
 
 int main()
 {
@@ -11,36 +63,25 @@ int main()
 	texture.loadFromFile("image/tile.png");
 	sf::Sprite sprite(texture);
 
+	sf::Texture texture_setka;
+	texture_setka.loadFromFile("image/setka.png");
+	sf::Sprite sprite_setka(texture_setka);
+
 	srand(time(NULL));
 
 	sprite.setTextureRect(sf::IntRect(0, 0, 40, 40));
 
-	const int H = 20; // Высота нашего поля
-	const int W = 10; // Ширина нашего поля
+	bool rotate = false, begin = true;
 
-	int pole[H][W] = { 0 };
+	int dx = 0, colorNum = 0;
 
-	int figures[7][4] =
-	{
-		1,3,5,7, // I
-		2,4,5,7, // Z
-		3,5,4,6, // S
-		3,5,4,7, // T
-		2,3,5,7, // L
-		3,5,7,6, // J
-		2,3,4,5, // O
-	};
+	int n = rand() % 6;
 
-	struct Point
-	{
-		int x, y;
-	};
+	float timer = 0, delay = 0.3;
 
-	Point a[4]; // массивчик для нахождения точек
+	sf::Clock clock;
 
-	bool s = true, rotate = false;
-
-	int dx = 0, dy = 0;
+	sprite_setka.move(520, 140);
 
 	while (window.isOpen())
 	{
@@ -51,6 +92,11 @@ int main()
 			if (event.type == sf::Event::Closed)
 				window.close();
 		}
+
+		float time = clock.getElapsedTime().asSeconds();
+		clock.restart();
+		timer += time;
+
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 		{
@@ -69,22 +115,26 @@ int main()
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 		{
-			dy = 2;
+			delay = 0.05;
 		}
 
 		for (int i = 0; i < 4; i++)
 		{
+			b[i] = a[i];
 			a[i].x += dx;
 		}
 
-		for (int i = 0; i < 4; i++)
+		if (check() == false)
 		{
-			a[i].y += dy;
+			for (int i = 0; i < 4; i++)
+			{
+				a[i] = b[i];
+			}
 		}
 
 		if (rotate == true)
 		{
-			Point t = a[1];
+			Points t = a[1];
 			for (int i = 0; i < 4; i++)
 			{
 				int x, y;
@@ -93,31 +143,110 @@ int main()
 				a[i].x = t.x - x;
 				a[i].y = t.y + y;
 			}
+
+			if (check() == false)
+			{
+				for (int i = 0; i < 4; i++)
+				{
+					a[i] = b[i];
+				}
+			}
 		}
 
-		int n = 2;
-
-		if (s == true)
+		if (timer > delay)
 		{
+			for (int i = 0; i < 4; i++)
+			{
+				b[i] = a[i];
+				a[i].y += 1;
+			}
+
+			if (check() == false)
+			{
+				for (int i = 0; i < 4; i++)
+				{
+					pole[b[i].y][b[i].x] = colorNum;
+				}
+				colorNum = rand() % 6;
+				n = rand() % 6;
+				for (int i = 0; i < 4; i++)
+				{
+					a[i].x = figures[n][i] % 2;
+					a[i].y = figures[n][i] / 2;
+				}
+			}
+			timer = 0;
+		}
+
+		int k = H - 1;
+		for (int i = H - 1; i > 0; i--)
+		{
+			int count = 0;
+			for (int j = 0; j < W; j++)
+			{
+				if (pole[i][j])
+				{
+					count++;
+				}
+				pole[k][j] = pole[i][j];
+			}
+			if (count < W)
+			{
+				k--;
+			}
+		}
+
+		if (begin == true)
+		{
+			begin = false;
+
+			n = rand() % 6;
+
 			for (int i = 0; i < 4; i++)
 			{
 				a[i].x = figures[n][i] % 2; // С помощью этого цикла переводим координаты в "видимые" нам
 				a[i].y = figures[n][i] / 2;
 			}
-			s = false;
 		}
 
 		dx = 0;
 		rotate = false;
-		
+		delay = 0.3;
 	
-		window.clear();
+		window.clear(sf::Color::White);
+
+		window.draw(sprite_setka);
+		
+
+		for (int i = 0; i < H; i++)
+		{
+			for (int j = 0; j < W; j++)
+			{
+				if (pole[i][j] == 0)
+				{
+					continue;
+				}
+				sprite.setTextureRect(sf::IntRect(pole[i][j] * 40, 0, 40, 40));
+				sprite.setPosition(j * 40, i * 40);
+				sprite.move(520, 140);
+				window.draw(sprite);
+			}
+		}
 
 		for (int i = 0; i < 4; i++)
 		{
+			sprite.setTextureRect(sf::IntRect(colorNum * 40, 0, 40, 40));
+
 			sprite.setPosition(a[i].x * 40, a[i].y * 40); // А с помощью этого выводим их на экран
 
+			sprite.move(520, 140);
+
 			window.draw(sprite);
+		}
+
+		if (EndGame() == false)
+		{
+			window.close();
 		}
 
 		window.display();
