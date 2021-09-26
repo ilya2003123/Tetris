@@ -47,7 +47,7 @@ bool check()
 		return 1;
 }
 
-bool EndGame()
+bool endGame()
 {
 	for (int i = 0; i < W; i++)
 	{
@@ -59,11 +59,93 @@ bool EndGame()
 	}
 }
 
+void menu(sf::RenderWindow& window)
+{
+	sf::Texture menu1, menu2, menu3;
+	menu1.loadFromFile("image/111.png");
+	menu2.loadFromFile("image/222.png");
+	menu3.loadFromFile("image/333.png");
+	sf::Sprite menu1s(menu1), menu2s(menu2), menu3s(menu3);
+
+	bool isMenu = true;
+	int menuNum = 0;
+
+	sf::Texture texture_fon;
+	texture_fon.loadFromFile("image/fon1.png");
+	sf::Sprite sprite_fon(texture_fon);
+
+	menu1s.setPosition(100, 80);
+	menu2s.setPosition(100, 200);
+	menu3s.setPosition(100, 320);
+
+	while (isMenu == true)
+	{
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+
+			if (event.type == sf::Event::Closed)
+				window.close();
+		}
+
+		window.clear();
+		menu1s.setColor(sf::Color::White);
+		menu2s.setColor(sf::Color::White);
+		menu3s.setColor(sf::Color::White);
+		menuNum = 0;
+
+		if (sf::IntRect(100, 80, 300, 100).contains(sf::Mouse::getPosition(window)))
+		{
+			menu1s.setColor(sf::Color::Red);
+			menuNum = 1;
+		}
+		else if (sf::IntRect(100, 200, 300, 100).contains(sf::Mouse::getPosition(window)))
+		{
+			menu2s.setColor(sf::Color::Red);
+			menuNum = 2;
+		}
+		else if (sf::IntRect(100, 320, 300, 100).contains(sf::Mouse::getPosition(window)))
+		{
+			menu3s.setColor(sf::Color::Red);
+			menuNum = 3;
+		}
+
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		{
+			if (menuNum == 1)
+			{
+				isMenu = false;
+			}
+			if (menuNum == 2)
+			{
+
+			}
+			if (menuNum == 3)
+			{
+				window.close();
+			}
+		}
+		
+
+		
+
+		window.draw(sprite_fon);
+		window.draw(menu1s);
+		window.draw(menu2s);
+		window.draw(menu3s);
+		window.display();
+	}
+}
+
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1920, 1080), "Tetris");
-
+	
 	window.setFramerateLimit(10);
+
+	menu(window);
+
+	srand(time(NULL));
 
 	sf::Texture texture;
 	texture.loadFromFile("image/tile.png");
@@ -73,7 +155,9 @@ int main()
 	texture_setka.loadFromFile("image/setka.png");
 	sf::Sprite sprite_setka(texture_setka);
 
-	srand(time(NULL));
+	sf::Texture texture_fon;
+	texture_fon.loadFromFile("image/fon1.png");
+	sf::Sprite sprite_fon(texture_fon);
 
 	sprite.setTextureRect(sf::IntRect(0, 0, 40, 40));
 
@@ -87,7 +171,7 @@ int main()
 
 	sf::Clock clock;
 
-	sprite_setka.move(520, 140);
+	sprite_setka.move(560, 140);
 
 	while (window.isOpen())
 	{
@@ -98,6 +182,8 @@ int main()
 			if (event.type == sf::Event::Closed)
 				window.close();
 		}
+
+		end = false;
 
 		float time = clock.getElapsedTime().asSeconds();
 		clock.restart();
@@ -228,6 +314,8 @@ int main()
 	
 		window.clear(sf::Color::White);
 
+		window.draw(sprite_fon);
+
 		window.draw(sprite_setka);
 		
 
@@ -249,7 +337,7 @@ int main()
 				}
 
 				sprite.setPosition(j * 40, i * 40);
-				sprite.move(520, 140);
+				sprite.move(600, 140);
 				window.draw(sprite);
 			}
 		}
@@ -260,14 +348,24 @@ int main()
 
 			sprite.setPosition(a[i].x * 40, a[i].y * 40); // А с помощью этого выводим их на экран
 
-			sprite.move(520, 140);
+			sprite.move(600, 140);
 
 			window.draw(sprite);
 		}
 
-		if (EndGame() == false || end == true)
-		{
-			window.close();
+		if (endGame() == false || end == true)
+		{	
+		//	window.display();
+			
+			menu(window);
+
+			for (int i = 0; i < H; i++)
+			{
+				for (int j = 0; j < W; j++)
+				{
+					pole[i][j] = 0;
+				}
+			}
 		}
 
 		window.display();
