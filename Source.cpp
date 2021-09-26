@@ -7,6 +7,8 @@ const int W = 15; // Ширина нашего поля
 
 int pole[H][W] = { 0 };
 
+bool end = false;
+
 int figures[7][4] =
 {
 	1,3,5,7, // I
@@ -35,6 +37,10 @@ bool check()
 		}
 		else if (pole[a[i].y][a[i].x])
 		{
+			if (a[i].y <= 0)
+			{
+				end = true;
+			}
 			return 0;
 		}
 	}
@@ -73,7 +79,7 @@ int main()
 
 	bool rotate = false, begin = true;
 
-	int dx = 0, colorNum = 0;
+	int dx = 0, colorNum = rand() % 6;
 
 	int n = rand() % 6;
 
@@ -165,14 +171,21 @@ int main()
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					pole[b[i].y][b[i].x] = colorNum;
+					if (colorNum == 0)
+					{
+						pole[b[i].y][b[i].x] = 231; // Уникальный код для нуля из-за поля именно для синего цвета
+					}
+					else
+					{
+						pole[b[i].y][b[i].x] = colorNum;
+					}
 				}
 				colorNum = rand() % 6;
-				n = rand() % 6;
+				n = rand() % 7;
 				for (int i = 0; i < 4; i++)
 				{
-					a[i].x = figures[n][i] % 2;
-					a[i].y = figures[n][i] / 2;
+					a[i].x = figures[n][i] % 2 + 6;
+					a[i].y = figures[n][i] / 2 - 5;
 				}
 			}
 			timer = 0;
@@ -200,12 +213,12 @@ int main()
 		{
 			begin = false;
 
-			n = rand() % 6;
+			n = rand() % 7;
 
 			for (int i = 0; i < 4; i++)
 			{
-				a[i].x = figures[n][i] % 2; // С помощью этого цикла переводим координаты в "видимые" нам
-				a[i].y = figures[n][i] / 2;
+				a[i].x = figures[n][i] % 2 + 6; // С помощью этого цикла переводим координаты в "видимые" нам
+				a[i].y = figures[n][i] / 2 - 5;
 			}
 		}
 
@@ -226,7 +239,15 @@ int main()
 				{
 					continue;
 				}
-				sprite.setTextureRect(sf::IntRect(pole[i][j] * 40, 0, 40, 40));
+				else if (pole[i][j] == 231)
+				{
+					sprite.setTextureRect(sf::IntRect(0, 0, 40, 40));
+				}
+				else
+				{
+					sprite.setTextureRect(sf::IntRect(pole[i][j] * 40, 0, 40, 40));
+				}
+
 				sprite.setPosition(j * 40, i * 40);
 				sprite.move(520, 140);
 				window.draw(sprite);
@@ -244,7 +265,7 @@ int main()
 			window.draw(sprite);
 		}
 
-		if (EndGame() == false)
+		if (EndGame() == false || end == true)
 		{
 			window.close();
 		}
