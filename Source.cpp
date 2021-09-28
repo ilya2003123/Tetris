@@ -101,7 +101,46 @@ void options(sf::RenderWindow& window)
 
 			if (event.type == sf::Event::Closed)
 				window.close();
+
+			if (sf::IntRect(728, 477, 50, 50).contains(sf::Mouse::getPosition(window)))
+			{
+				f = 1;
+			}
+
+			if (sf::IntRect(940, 477, 50, 50).contains(sf::Mouse::getPosition(window)))
+			{
+				f = 2;
+			}
+
+			if (sf::IntRect(50, 900, 200, 100).contains(sf::Mouse::getPosition(window)))
+			{
+				sprite_exit.setColor(sf::Color::Red);
+
+				f = 3;
+			}
+
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+			{
+				if (f == 1 && l > 0)
+				{
+					l -= 1;
+				}
+				if (f == 2 && l < 9)
+				{
+					l += 1;
+				}
+				if (f == 3)
+				{
+					isoptions = false;
+
+					return;
+				}
+			}
+
+
 		}
+		
+		f = 0;
 
 		sprite_exit.setColor(sf::Color::White);
 
@@ -112,41 +151,6 @@ void options(sf::RenderWindow& window)
 		triangle1.setFillColor(sf::Color::Red);
 		triangle1.setPosition(1000, 463);
 		triangle1.setRotation(90.f);
-
-		if (sf::IntRect(728, 477, 50, 50).contains(sf::Mouse::getPosition(window)))
-		{
-			f = 1;
-		}
-
-		if (sf::IntRect(940, 477, 50, 50).contains(sf::Mouse::getPosition(window)))
-		{
-			f = 2;
-		}
-
-		if (sf::IntRect(50, 900, 200, 100).contains(sf::Mouse::getPosition(window)))
-		{
-			sprite_exit.setColor(sf::Color::Red);
-
-			f = 3;
-		}
-
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-		{
-			if (f == 1 && l > 0)
-			{
-				l -= 1;
-			}
-			if (f == 2 && l < 9)
-			{
-				l += 1;
-			}
-			if (f == 3)
-			{
-				isoptions = false;
-
-				return;
-			}
-		}
 
 		window.clear();
 
@@ -316,7 +320,7 @@ int main()
 
 	int dx = 0, colorNum1 = rand() % 6, colorNum2 = rand() % 6, score = 0;
 
-	float timer = 0, delay = 0.3 / (l + 1);
+	float timer = 0, delay = 0.3f / (l + 1);
 
 	int k1 = rand() % 7;
 
@@ -502,7 +506,7 @@ int main()
 
 		dx = 0;
 		rotate = false;
-		delay = 0.3 / (l + 1);
+		delay = 0.3f / (l + 1);
 	
 		window.clear();
 
