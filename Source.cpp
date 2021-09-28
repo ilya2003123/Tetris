@@ -9,6 +9,10 @@ const int W = 15; // Ширина нашего поля
 
 int l = 0;
 
+int volume = 50;
+
+sf::Texture texture_fon;
+
 int pole[H][W] = { 0 };
 
 sf::Music music;
@@ -72,10 +76,6 @@ bool endGame()
 
 void options(sf::RenderWindow& window)
 {
-	sf::Texture texture_options;
-	texture_options.loadFromFile("image/options.png");
-	sf::Sprite sprite_options(texture_options);
-
 	sf::Texture texture_exit;
 	texture_exit.loadFromFile("image/exit.png");
 	sf::Sprite sprite_exit(texture_exit);
@@ -86,10 +86,29 @@ void options(sf::RenderWindow& window)
 	sf::Font font1;
 	font1.loadFromFile("rus.ttf");
 
+	sf::Font font2;
+	font2.loadFromFile("rus.ttf");
+	
+	sf::Font font3;
+	font3.loadFromFile("rus.ttf");
+
 	sf::Text txt1;
 	txt1.setFont(font1);
 	txt1.setCharacterSize(62);
 	txt1.setFillColor(sf::Color::Red);
+
+	sf::Text txt2;
+	txt2.setFont(font2);
+	txt2.setCharacterSize(110);
+	txt2.setFillColor(sf::Color::Red);
+
+	sf::Text txt3;
+	txt3.setFont(font3);
+	txt3.setCharacterSize(110);
+	txt3.setFillColor(sf::Color::Red);
+
+	texture_fon.loadFromFile("image/fon1.png");
+	sf::Sprite sprite_fon(texture_fon);
 
 	int f = 0;
 
@@ -104,12 +123,12 @@ void options(sf::RenderWindow& window)
 			if (event.type == sf::Event::Closed)
 				window.close();
 
-			if (sf::IntRect(728, 477, 50, 50).contains(sf::Mouse::getPosition(window)))
+			if (sf::IntRect(728, 377, 50, 50).contains(sf::Mouse::getPosition(window)))
 			{
 				f = 1;
 			}
 
-			if (sf::IntRect(940, 477, 50, 50).contains(sf::Mouse::getPosition(window)))
+			if (sf::IntRect(940, 377, 50, 50).contains(sf::Mouse::getPosition(window)))
 			{
 				f = 2;
 			}
@@ -119,6 +138,16 @@ void options(sf::RenderWindow& window)
 				sprite_exit.setColor(sf::Color::Red);
 
 				f = 3;
+			}
+
+			if (sf::IntRect(740, 520, 50, 50).contains(sf::Mouse::getPosition(window)))
+			{
+				f = 4;
+			}
+
+			if (sf::IntRect(1000, 520, 50, 50).contains(sf::Mouse::getPosition(window)))
+			{
+				f = 5;
 			}
 
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
@@ -134,39 +163,70 @@ void options(sf::RenderWindow& window)
 				if (f == 3)
 				{
 					isoptions = false;
-
-					return;
+				}
+				if (f == 4 && volume > 0 )
+				{
+					volume -= 10;
+				}
+				if (f == 5 && volume < 100)
+				{
+					volume += 10;
 				}
 			}
-
-
 		}
 		
 		f = 0;
 
 		triangle.setFillColor(sf::Color::Red);
-		triangle.setPosition(720, 543);
+		triangle.setPosition(720, 443);
 		triangle.setRotation(270.f);
 
 		triangle1.setFillColor(sf::Color::Red);
-		triangle1.setPosition(1000, 463);
+		triangle1.setPosition(1000, 363);
 		triangle1.setRotation(90.f);
 
 		window.clear();
 
-		txt1.setString(std::to_string(l));
-		txt1.setPosition(840, 465);
+		window.draw(sprite_fon);
 
-		window.draw(sprite_options);
+		window.draw(triangle);
+
+		window.draw(triangle1);
+
+		txt1.setString(std::to_string(l));
+		txt1.setPosition(840, 365);
+		
+		window.draw(txt1);
+
+		txt3.setString("Level:");
+		txt3.setPosition(400, 322);
+
+		window.draw(txt3);
+
+		txt2.setString("Music:");
+		txt2.setPosition(400, 465);
+
+		window.draw(txt2);
+
+		txt1.setString(std::to_string(volume));
+		txt1.setPosition(840, 500);
+
+		window.draw(txt1);
 
 		sprite_exit.setPosition(50, 900);
 
 		window.draw(sprite_exit);
+		
+		triangle.setFillColor(sf::Color::Red);
+		triangle.setPosition(730, 585);
+		triangle.setRotation(270.f);
 
-		window.draw(txt1);
-		
+		triangle1.setFillColor(sf::Color::Red);
+		triangle1.setPosition(1060, 505);
+		triangle1.setRotation(90.f);
+
 		window.draw(triangle);
-		
+
 		window.draw(triangle1);
 		
 		window.display();
@@ -186,7 +246,6 @@ void menu(sf::RenderWindow& window)
 
 	sory.stop();
 
-	sf::Texture texture_fon;
 	texture_fon.loadFromFile("image/fon1.png");
 	sf::Sprite sprite_fon(texture_fon);
 
@@ -195,6 +254,7 @@ void menu(sf::RenderWindow& window)
 	sf::Sprite sprite_fon1(texture_fon1);
 
 	music.openFromFile("music/menu.wav");
+	music.setVolume(volume);
 	music.play();
 
 	menu1s.setPosition(100, 80);
@@ -355,6 +415,7 @@ int main()
 
 		if (music1.getStatus() != 2)
 		{
+			music1.setVolume(volume);
 			music1.play();
 		}
 	
@@ -577,6 +638,7 @@ int main()
 
 			if (sory.getStatus() != 2)
 			{
+				sory.setVolume(volume);
 				sory.play();
 			}
 
