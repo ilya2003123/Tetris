@@ -7,7 +7,7 @@
 const int H = 20; // Высота нашего поля
 const int W = 15; // Ширина нашего поля
 
-int l = 0;
+int l = 0, hscore = 0, score = 0;
 
 int volume = 50;
 
@@ -162,6 +162,12 @@ void options(sf::RenderWindow& window)
 				}
 				if (f == 3)
 				{
+					music.setVolume(volume);
+
+					music1.setVolume(volume);
+
+					sory.setVolume(volume);
+
 					isoptions = false;
 				}
 				if (f == 4 && volume > 0 )
@@ -209,7 +215,7 @@ void options(sf::RenderWindow& window)
 		window.draw(txt2);
 
 		txt1.setString(std::to_string(volume));
-		txt1.setPosition(840, 500);
+		txt1.setPosition(850, 500);
 
 		window.draw(txt1);
 
@@ -309,15 +315,31 @@ void menu(sf::RenderWindow& window)
 			}
 			if (menuNum == 2)
 			{
-				music.stop();
-
 				isoptions = true;
 
 				options(window);
 			}
 			if (menuNum == 3)
 			{
+				music.stop();
+
+				music1.stop();
+				
+				sory.stop();
+
+				if (score > hscore)
+				{
+					std::ofstream out("Hscore.txt", std::ios::trunc); // окрываем файл для записи
+					if (out.is_open())
+					{
+						out << score; // Записываем в файл high score игрока
+					}
+					out.close();     // закрываем файл
+				}
+				
 				window.close();
+
+				exit(0);
 			}
 		}
 		
@@ -393,7 +415,7 @@ int main()
 
 	bool rotate = false, begin = true, chek = false;
 
-	int dx = 0, colorNum1 = rand() % 6, colorNum2 = rand() % 6, score = 0;
+	int dx = 0, colorNum1 = rand() % 6, colorNum2 = rand() % 6;
 
 	double timer = 0, delay = 0.3f / (l + 1);
 
@@ -404,8 +426,6 @@ int main()
 	sf::Clock clock;
 
 	sprite_setka.move(560, 140);
-		
-	int hscore = 0;
 
 	std::ifstream in("Hscore.txt"); // окрываем файл для чтения
 	if (in.is_open())
@@ -720,16 +740,6 @@ int main()
 
 		window.display();
 	}
-	if (score > hscore)
-	{
-		std::ofstream out("Hscore.txt", std::ios::trunc); // окрываем файл для записи
-		if (out.is_open())
-		{
-			out << score; // Записываем в файл high score игрока
-		}
-		out.close();     // закрываем файл
-	}
 
-	system("pause");
 	return 0;
 }
