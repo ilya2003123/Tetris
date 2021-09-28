@@ -669,7 +669,7 @@ int main()
 
 			music1.stop();
 
-			if (sory.getStatus() != 2)
+			if(sory.getStatus() != 2)
 			{
 				sory.setVolume(volume);
 				sory.play();
