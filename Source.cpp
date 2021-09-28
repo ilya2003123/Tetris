@@ -95,6 +95,8 @@ void options(sf::RenderWindow& window)
 
 	while (isoptions == true)
 	{
+		sprite_exit.setColor(sf::Color::White);
+
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
@@ -141,8 +143,6 @@ void options(sf::RenderWindow& window)
 		}
 		
 		f = 0;
-
-		sprite_exit.setColor(sf::Color::White);
 
 		triangle.setFillColor(sf::Color::Red);
 		triangle.setPosition(720, 543);
