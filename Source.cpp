@@ -201,6 +201,8 @@ void menu(sf::RenderWindow& window)
 	menu2s.setPosition(100, 200);
 	menu3s.setPosition(100, 320);
 
+	isMenu = true;
+
 	while (isMenu == true)
 	{
 		sf::Event event;
@@ -320,7 +322,7 @@ int main()
 
 	int dx = 0, colorNum1 = rand() % 6, colorNum2 = rand() % 6, score = 0;
 
-	float timer = 0, delay = 0.3f / (l + 1);
+	double timer = 0, delay = 0.3f / (l + 1);
 
 	int k1 = rand() % 7;
 
@@ -341,6 +343,8 @@ int main()
 
 	while (window.isOpen())
 	{
+		window.setFramerateLimit(10 + l * 5);
+
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
@@ -377,12 +381,13 @@ int main()
 			dx = 1;
 		}
 
+		delay = 0.3f / (l + 1);
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && gameOver == false)
 		{
-			delay = 0.05 / (l + 1);
+			delay = 0.05f / (l + 1);
 		}
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4 && gameOver == false; i++)
 		{
 			b[i] = a[i];
 			a[i].x += dx;
@@ -506,7 +511,6 @@ int main()
 
 		dx = 0;
 		rotate = false;
-		delay = 0.3f / (l + 1);
 	
 		window.clear();
 
