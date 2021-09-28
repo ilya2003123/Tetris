@@ -1,13 +1,23 @@
 #include <SFML/Graphics.hpp>
-#include<ctime>
-#include<iostream>
+#include <ctime>
+#include <iostream>
+#include <fstream>
+#include <SFML/Audio.hpp>
 
 const int H = 20; // Высота нашего поля
 const int W = 15; // Ширина нашего поля
 
+int l = 0;
+
 int pole[H][W] = { 0 };
 
-bool end = false;
+sf::Music music;
+sf::Music music1;
+sf::Music sory;
+
+void menu(sf::RenderWindow& window);
+
+bool end = false, gameOver = false, isMenu = true, isoptions = false;
 
 int figures[7][4] =
 {
@@ -25,7 +35,7 @@ struct Points
 	int x, y;
 };
 
-Points a[4], b[4]; // а[4] массивчик для нахождения точек, b[4] вспомогательный массивчик 
+Points a[4], b[4], c[4]; // а[4] массивчик для нахождения точек, b[4] вспомогательный массивчик 
 
 bool check()
 {
@@ -59,6 +69,107 @@ bool endGame()
 	}
 }
 
+
+void options(sf::RenderWindow& window)
+{
+	sf::Texture texture_options;
+	texture_options.loadFromFile("image/options.png");
+	sf::Sprite sprite_options(texture_options);
+
+	sf::Texture texture_exit;
+	texture_exit.loadFromFile("image/exit.png");
+	sf::Sprite sprite_exit(texture_exit);
+
+	sf::CircleShape triangle(40.f, 3);
+	sf::CircleShape triangle1(40.f, 3);
+
+	sf::Font font1;
+	font1.loadFromFile("rus.ttf");
+
+	sf::Text txt1;
+	txt1.setFont(font1);
+	txt1.setCharacterSize(62);
+	txt1.setFillColor(sf::Color::Red);
+
+	int f = 0;
+
+	while (isoptions == true)
+	{
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+
+			if (event.type == sf::Event::Closed)
+				window.close();
+		}
+
+		sprite_exit.setColor(sf::Color::White);
+
+		triangle.setFillColor(sf::Color::Red);
+		triangle.setPosition(720, 543);
+		triangle.setRotation(270.f);
+
+		triangle1.setFillColor(sf::Color::Red);
+		triangle1.setPosition(1000, 463);
+		triangle1.setRotation(90.f);
+
+		if (sf::IntRect(728, 477, 50, 50).contains(sf::Mouse::getPosition(window)))
+		{
+			f = 1;
+		}
+
+		if (sf::IntRect(940, 477, 50, 50).contains(sf::Mouse::getPosition(window)))
+		{
+			f = 2;
+		}
+
+		if (sf::IntRect(50, 900, 200, 100).contains(sf::Mouse::getPosition(window)))
+		{
+			sprite_exit.setColor(sf::Color::Red);
+
+			f = 3;
+		}
+
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		{
+			if (f == 1 && l > 0)
+			{
+				l -= 1;
+			}
+			if (f == 2 && l < 9)
+			{
+				l += 1;
+			}
+			if (f == 3)
+			{
+				isoptions = false;
+
+				return;
+			}
+		}
+
+		window.clear();
+
+		txt1.setString(std::to_string(l));
+		txt1.setPosition(840, 465);
+
+		window.draw(sprite_options);
+
+		sprite_exit.setPosition(50, 900);
+
+		window.draw(sprite_exit);
+
+		window.draw(txt1);
+		
+		window.draw(triangle);
+		
+		window.draw(triangle1);
+		
+		window.display();
+	}
+
+}
+
 void menu(sf::RenderWindow& window)
 {
 	sf::Texture menu1, menu2, menu3;
@@ -67,12 +178,20 @@ void menu(sf::RenderWindow& window)
 	menu3.loadFromFile("image/333.png");
 	sf::Sprite menu1s(menu1), menu2s(menu2), menu3s(menu3);
 
-	bool isMenu = true;
 	int menuNum = 0;
+
+	sory.stop();
 
 	sf::Texture texture_fon;
 	texture_fon.loadFromFile("image/fon1.png");
 	sf::Sprite sprite_fon(texture_fon);
+
+	sf::Texture texture_fon1;
+	texture_fon1.loadFromFile("image/fon.png");
+	sf::Sprite sprite_fon1(texture_fon1);
+
+	music.openFromFile("music/menu.wav");
+	music.play();
 
 	menu1s.setPosition(100, 80);
 	menu2s.setPosition(100, 200);
@@ -114,11 +233,17 @@ void menu(sf::RenderWindow& window)
 		{
 			if (menuNum == 1)
 			{
+				music.stop();
+
 				isMenu = false;
 			}
 			if (menuNum == 2)
 			{
+				music.stop();
 
+				isoptions = true;
+
+				options(window);
 			}
 			if (menuNum == 3)
 			{
@@ -126,10 +251,10 @@ void menu(sf::RenderWindow& window)
 			}
 		}
 		
-
-		
+		sprite_fon1.setPosition(550, 60);
 
 		window.draw(sprite_fon);
+		window.draw(sprite_fon1);
 		window.draw(menu1s);
 		window.draw(menu2s);
 		window.draw(menu3s);
@@ -147,9 +272,13 @@ int main()
 
 	srand(time(NULL));
 
-	sf::Texture texture;
-	texture.loadFromFile("image/tile.png");
-	sf::Sprite sprite(texture);
+	sf::Texture texture_k1;
+	texture_k1.loadFromFile("image/tile.png");
+	sf::Sprite sprite_k1(texture_k1);
+
+	sf::Texture texture_k2;
+	texture_k2.loadFromFile("image/tile.png");
+	sf::Sprite sprite_k2(texture_k2);
 
 	sf::Texture texture_setka;
 	texture_setka.loadFromFile("image/setka.png");
@@ -167,35 +296,44 @@ int main()
 	texture_next.loadFromFile("image/Next.png");
 	sf::Sprite sprite_next(texture_next);
 
+	sf::Texture texture_game_over;
+	texture_game_over.loadFromFile("image/gameover.png");
+	sf::Sprite sprite_gameOver(texture_game_over);
+
+	sory.openFromFile("music/sory.wav");
+
+	music1.openFromFile("music/tetris.wav");
+
 	sf::Font font;
 	font.loadFromFile("rus.ttf");
-
-	font.loadFromFile("rus.ttf");
-
+	
 	sf::Text txt;
 	txt.setFont(font);
 	txt.setCharacterSize(62);
 	txt.setFillColor(sf::Color::Red);
 
-	bool rotate = false, begin = true;
+	bool rotate = false, begin = true, chek = false;
 
-	int dx = 0, colorNum = rand() % 6, score = 0;
+	int dx = 0, colorNum1 = rand() % 6, colorNum2 = rand() % 6, score = 0;
 
-	float timer = 0, delay = 0.3;
+	float timer = 0, delay = 0.3 / (l + 1);
 
-	//nt n = rand() % 7;
+	int k1 = rand() % 7;
 
-	//
-	//1 2
-	//-1 2
-	//int k = 0
-	//
-	int current = 0;
-	int rnd[2] = { rand() % 7 , rand() % 7  };
+	int k2 = rand() % 7;
 
 	sf::Clock clock;
 
 	sprite_setka.move(560, 140);
+		
+	int hscore = 0;
+
+	std::ifstream in("Hscore.txt"); // окрываем файл для чтения
+	if (in.is_open())
+	{
+		in >> hscore; // считываем с файла high score
+	}
+	in.close();     // закрываем файл
 
 	while (window.isOpen())
 	{
@@ -207,6 +345,12 @@ int main()
 				window.close();
 		}
 
+		if (music1.getStatus() != 2)
+		{
+			music1.play();
+		}
+	
+
 		end = false;
 
 		float time = clock.getElapsedTime().asSeconds();
@@ -214,24 +358,24 @@ int main()
 		timer += time;
 
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && gameOver == false)
 		{
 			rotate = true;
 		}
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && gameOver == false)
 		{
 			dx = -1;
 		}
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && gameOver == false)
 		{
 			dx = 1;
 		}
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && gameOver == false)
 		{
-			delay = 0.05;
+			delay = 0.05 / (l + 1);
 		}
 
 		for (int i = 0; i < 4; i++)
@@ -240,7 +384,7 @@ int main()
 			a[i].x += dx;
 		}
 
-		if (check() == false)
+		if (check() == false && gameOver == false)
 		{
 			for (int i = 0; i < 4; i++)
 			{
@@ -248,7 +392,7 @@ int main()
 			}
 		}
 
-		if (rotate == true)
+		if (rotate == true && gameOver == false)
 		{
 			Points t = a[1];
 			for (int i = 0; i < 4; i++)
@@ -260,7 +404,7 @@ int main()
 				a[i].y = t.y + y;
 			}
 
-			if (check() == false)
+			if (check() == false && gameOver == false)
 			{
 				for (int i = 0; i < 4; i++)
 				{
@@ -269,7 +413,7 @@ int main()
 			}
 		}
 
-		if (timer > delay)
+		if (timer > delay && gameOver == false)
 		{
 			for (int i = 0; i < 4; i++)
 			{
@@ -277,97 +421,94 @@ int main()
 				a[i].y += 1;
 			}
 
-			if (check() == false)
+			if (check() == false && gameOver == false)
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					if (colorNum == 0)
+					if (colorNum1 == 0)
 					{
-						pole[b[i].y][b[i].x] = 231; // Уникальный код для нуля из-за поля именно для синего цвета
+						pole[b[i].y][b[i].x] = 231; // Уникальный код для нуля из-за поля, именно для синего цвета
 					}
 					else
 					{
-						pole[b[i].y][b[i].x] = colorNum;
+						pole[b[i].y][b[i].x] = colorNum1;
 					}
 				}
-				colorNum = rand() % 6;
+				colorNum1 = colorNum2;
+				colorNum2 = rand() % 6;
+				k2 = rand() % 7;
 				for (int i = 0; i < 4; i++)
 				{
-					a[i].x = figures[rnd[current]][i] % 2 + 6;
-					a[i].y = figures[rnd[current]][i] / 2 - 5;
+					a[i].x = c[i].x + 1;
+					a[i].y = c[i].y - 6;
 				}
-				if (current == 0){
-						current = 1;
-						rnd[0] = rand() % 7;
-					}else if(current == 1){
-						current = 0;
-						rnd[1] = rand() % 7;
-					}
-						
+				for (int i = 0; i < 4; i++)
+				{
+					c[i].x = figures[k2][i] % 2 + 5;
+					c[i].y = figures[k2][i] / 2 + 1;
+				}
 			}
 			timer = 0;
 		}
 
+		int globalcount = 0;
 		int k = H - 1;
 		for (int i = H - 1; i > 0; i--)
 		{
 			int count = 0;
 			for (int j = 0; j < W; j++)
 			{
-				if (pole[i][j])
+				if (pole[i][j] && gameOver == false)
 				{
 					count++;
 				}
 				pole[k][j] = pole[i][j];
 			}
-			if (count < W)
+			if (count < W && gameOver == false)
 			{
 				k--;
 			}
-			if (count == 15)
+			if (count == 15 && gameOver == false)
 			{
-				score += 50;
-			}
-			if (count == 30)
-			{
-				score += 150;
-			}
-			if (count == 45)
-			{
-				score += 250;
-			}
-			if (count == 60)
-			{
-				score += 400;
+				globalcount += count;
 			}
 		}
 
-		if (begin == true)
+		if (globalcount >= 15 && gameOver == false)
+		{
+			score += 25 + 25 * (globalcount / 15 - 1) * globalcount / 15;
+		}
+		globalcount = 0;
+
+		if (begin == true && gameOver == false)
 		{
 			begin = false;
 
-			//n = rand() % 7;
+			k1 = rand() % 7;
+
+			k2 = rand() % 7;
 
 			for (int i = 0; i < 4; i++)
 			{
-				//a[i].x = figures[n][i] % 2 + 6; // С помощью этого цикла переводим координаты в "видимые" нам
-				//a[i].y = figures[n][i] / 2 - 5;
-				a[i].x = figures[rnd[current]][i] % 2 + 6;
-			    a[i].y = figures[rnd[current]][i] / 2 - 5;
-			    
+				a[i].x = figures[k1][i] % 2 + 6; // С помощью этого цикла переводим координаты в "видимые" нам
+				a[i].y = figures[k1][i] / 2 - 5;
+			}
+			for (int i = 0; i < 4; i++)
+			{
+				c[i].x = figures[k2][i] % 2 + 5;
+				c[i].y = figures[k2][i] / 2 + 1;
 			}
 		}
 
 		dx = 0;
 		rotate = false;
-		delay = 0.3;
+		delay = 0.3 / (l + 1);
 	
 		window.clear();
 
 		window.draw(sprite_fon);
 
 		window.draw(sprite_setka);
-		
 
 		for (int i = 0; i < H; i++)
 		{
@@ -379,61 +520,99 @@ int main()
 				}
 				else if (pole[i][j] == 231)
 				{
-					sprite.setTextureRect(sf::IntRect(0, 0, 40, 40));
+					sprite_k1.setTextureRect(sf::IntRect(0, 0, 40, 40));
 				}
 				else
 				{
-					sprite.setTextureRect(sf::IntRect(pole[i][j] * 40, 0, 40, 40));
+					sprite_k1.setTextureRect(sf::IntRect(pole[i][j] * 40, 0, 40, 40));
 				}
 
-				sprite.setPosition(j * 40, i * 40);
-				sprite.move(600, 140);
-				window.draw(sprite);
+				sprite_k1.setPosition(j * 40, i * 40);
+				sprite_k1.move(600, 140);
+				window.draw(sprite_k1);
 			}
 		}
 
 		for (int i = 0; i < 4; i++)
 		{
-			sprite.setTextureRect(sf::IntRect(colorNum * 40, 0, 40, 40));
+			sprite_k1.setTextureRect(sf::IntRect(colorNum1 * 40, 0, 40, 40));
 
-			sprite.setPosition(a[i].x * 40, a[i].y * 40); // А с помощью этого выводим их на экран
+			sprite_k1.setPosition(a[i].x * 40, a[i].y * 40); // А с помощью этого выводим их на экран
 
-			sprite.move(600, 140);
+			sprite_k1.move(600, 140);
 
-			window.draw(sprite);
+			window.draw(sprite_k1);
 		}
 
-		if (endGame() == false || end == true)
-		{	
-			menu(window);
+		for (int i = 0; i < 4; i++)
+		{
+			sprite_k2.setTextureRect(sf::IntRect(colorNum2 * 40, 0, 40, 40));
 
-			end = false;
+			sprite_k2.setPosition(c[i].x * 40, c[i].y * 40); // А с помощью этого выводим их на экран
 
-			rotate = false;
+			sprite_k2.move(200, 150);
 
-			begin = true;
+			window.draw(sprite_k2);
+		}
 
-			dx = 0;
+		if (endGame() == false || end == true || gameOver == true)
+		{
+			delay = 0 / (l + 1);
 
-			colorNum = rand() % 6;
+			sprite_gameOver.setPosition(650, 400);
 
-			//n = rand() % 7;
+			window.draw(sprite_gameOver);
 
-			score = 0;
+			gameOver = true;
 
-			timer = 0, delay = 0.3;
+			music1.stop();
 
-			for (int i = 0; i < 4; i++)
+			if (sory.getStatus() != 2)
 			{
-				a[i] = { 0,0 }; // x и y в нули
-				b[i] = { 0,0 };
+				sory.play();
 			}
 
-			for (int i = 0; i < H; i++)
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 			{
-				for (int j = 0; j < W; j++)
+				menu(window);
+
+				gameOver = false;
+
+				end = false;
+
+				rotate = false;
+
+				begin = true;
+
+				dx = 0;
+
+				colorNum1 = rand() % 6;
+
+				k1 = rand() % 7;
+
+				k2 = rand() % 7;
+
+				if (score > hscore)
 				{
-					pole[i][j] = 0;
+					hscore = score;
+				}
+				score = 0;
+
+				timer = 0, delay = 0.3 / (l+1);
+
+				for (int i = 0; i < 4; i++)
+				{
+					a[i] = { 0,0 }; // x и y в нули
+					b[i] = { 0,0 };
+					c[i] = { 0,0 };
+				}
+
+				for (int i = 0; i < H; i++)
+				{
+					for (int j = 0; j < W; j++)
+					{
+						pole[i][j] = 0;
+					}
 				}
 			}
 		}
@@ -442,14 +621,30 @@ int main()
 
 		window.draw(sprite_score);
 
-		txt.setString(std::to_string(score) + " NextFig = " + std::to_string(rnd[(current)?0:1]));
+		txt.setString(std::to_string(score));
 		txt.setPosition(1480, 130);
 
-		sprite_next.setPosition(300, 100);
+		window.draw(txt);
+
+		txt.setString("\nHigh score:" + std::to_string(hscore));
+		txt.setPosition(1270, 130);
+
+		sprite_next.setPosition(300, 80);
+
 		window.draw(sprite_next);
+		
 		window.draw(txt);
 
 		window.display();
+	}
+	if (score > hscore)
+	{
+		std::ofstream out("Hscore.txt", std::ios::trunc); // окрываем файл для записи
+		if (out.is_open())
+		{
+			out << score; // Записываем в файл high score игрока
+		}
+		out.close();     // закрываем файл
 	}
 
 	system("pause");
