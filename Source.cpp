@@ -239,7 +239,7 @@ void menu(sf::RenderWindow& window)
 	sf::Texture menu1, menu2, menu3;
 	menu1.loadFromFile("image/111.png");
 	menu2.loadFromFile("image/222.png");
-	menu3.loadFromFile("image/333.png");
+	menu3.loadFromFile("image/exit.png");
 	sf::Sprite menu1s(menu1), menu2s(menu2), menu3s(menu3);
 
 	int menuNum = 0;
@@ -253,13 +253,17 @@ void menu(sf::RenderWindow& window)
 	texture_fon1.loadFromFile("image/fon.png");
 	sf::Sprite sprite_fon1(texture_fon1);
 
+	sf::Texture texture_ps;
+	texture_ps.loadFromFile("image/ps.png");
+	sf::Sprite sprite_ps(texture_ps);
+
 	music.openFromFile("music/menu.wav");
 	music.setVolume(volume);
 	music.play();
 
 	menu1s.setPosition(100, 80);
-	menu2s.setPosition(100, 200);
-	menu3s.setPosition(100, 320);
+	menu2s.setPosition(150, 200);
+	menu3s.setPosition(150, 320);
 
 	isMenu = true;
 
@@ -279,17 +283,17 @@ void menu(sf::RenderWindow& window)
 		menu3s.setColor(sf::Color::White);
 		menuNum = 0;
 
-		if (sf::IntRect(100, 80, 300, 100).contains(sf::Mouse::getPosition(window)))
+		if (sf::IntRect(100, 80, 340, 80).contains(sf::Mouse::getPosition(window)))
 		{
 			menu1s.setColor(sf::Color::Red);
 			menuNum = 1;
 		}
-		else if (sf::IntRect(100, 200, 300, 100).contains(sf::Mouse::getPosition(window)))
+		else if (sf::IntRect(150, 220, 240, 60).contains(sf::Mouse::getPosition(window)))
 		{
 			menu2s.setColor(sf::Color::Red);
 			menuNum = 2;
 		}
-		else if (sf::IntRect(100, 320, 300, 100).contains(sf::Mouse::getPosition(window)))
+		else if (sf::IntRect(210, 350, 140, 60).contains(sf::Mouse::getPosition(window)))
 		{
 			menu3s.setColor(sf::Color::Red);
 			menuNum = 3;
@@ -317,20 +321,29 @@ void menu(sf::RenderWindow& window)
 			}
 		}
 		
-		sprite_fon1.setPosition(550, 60);
+		sprite_fon1.setPosition(1050, 60);
 
 		window.draw(sprite_fon);
+		
 		window.draw(sprite_fon1);
+
+		sprite_ps.setPosition(50, 500);
+
+		window.draw(sprite_ps);
+		
 		window.draw(menu1s);
+		
 		window.draw(menu2s);
+		
 		window.draw(menu3s);
+		
 		window.display();
 	}
 }
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(1920, 1080), "Tetris");
+	sf::RenderWindow window(sf::VideoMode(1920, 1080), "Tetris", sf::Style::Fullscreen);
 	
 	window.setFramerateLimit(10);
 
